@@ -19,43 +19,54 @@ If you already use git for your project, then just add this as a submodule.
 You can use the XCProject class in any part of your editor and postprocess code. Taking advantage of the great powers of the new PostProcessBuild attribute, I suggest to use a small cs static class to run through all the projmods files in your asses folder and simply apply them to the newly created xcode project.
 
 ```cs
+#if UNITY_IPHONE
+
+using UnityEngine;
 using UnityEditor;
+using UnityEditor.Callbacks;
 
-public static class XCodePostProcess
+using System;
+using System.Diagnostics;
+
+namespace UnityEditor.XCodeEditor
 {
-    [PostProcessBuild]
-    public static void OnPostProcessBuild( BuildTarget target, string path )
-    {
-        // Create a new project object from build target
-        XCodeEditor.XCProject project = new XCodeEditor.XCProject( targetPath );
+	public class CustomPostprocessScript : MonoBehaviour
+	{
+		[PostProcessBuild]
+		public static void OnPostprocessBuild(BuildTarget target, string pathToBuildProject)
+		{ 
+	#if UNITY_EDITOR
+			XCodeEditor.XCProject project = new XCodeEditor.XCProject( pathToBuildProject );
 
-        // Find and run through all projmods files to patch the project
-        var files = System.IO.Directory.GetFiles( Application.dataPath, "*.projmods", SearchOption.AllDirectories );
-        foreach( var file in files ) {
-            project.ApplyMod( file );
-        }
-
-        // Finally save the xcode project
-        project.Save();
-    }
+			project.ApplyMod( "Assets/Editor/sample_config.projmods" );
+			
+			// Finally save the xcode project
+			project.Save();
+	#endif
+		}
+	}
 }
+
+#endif
+
 ```
 
 The projmods file is a simple text file containing a JSON object. It will be used to pass the parameters to the ApplyMod method. This is the file I use for the GameCenter plugin as a brief example:
 
 ```json
 {
-    "group":       "GameCenter",
-    "libs":        [],
-    "frameworks":  ["GameKit.framework"],
-    "headerpaths": ["Editor/iOS/GameCenter/**"],
-    "files":       ["Editor/iOS/GameCenter/GameCenterBinding.m",
-                    "Editor/iOS/GameCenter/GameCenterController.h",
-                    "Editor/iOS/GameCenter/GameCenterController.mm",
-                    "Editor/iOS/GameCenter/GameCenterManager.h",
-                    "Editor/iOS/GameCenter/GameCenterManager.m"],
-    "folders":     [],
-    "excludes":    ["^.*.meta$", "^.*.mdown^", "^.*.pdf$"]
+    "group": "Services",
+    "libs": ["libsqlite3.dylib"],
+    "frameworks": ["MessageUI.framework","StoreKit.framework","iAd.framework","CoreData.framework","SystemConfiguration.framework","Social.framework:","Security.framework:","Accounts.framework:","AdSupport.framework:"],
+    "headerpaths": [],                    
+    "files": ["ObjC/NativeCode/Appirater.m", "ObjC/NativeCode/Appirater.h"],
+    "folders": ["ObjC/Chartboost/"],
+    "excludes": ["^.*.DS_Store$","^.*.meta$", "^.*.mdown^", "^.*.pdf$", "^.*.svn$"],
+    "buildSettings": { 
+    	"GCC_ENABLE_CPP_EXCEPTIONS": "YES",
+    	"GCC_ENABLE_OBJC_EXCEPTIONS": "YES",
+    	"OTHER_LDFLAGS" : ["-ObjC"]
+    }
 }
 ```
 
