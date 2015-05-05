@@ -3,8 +3,8 @@
     "libs": ["libsqlite3.dylib"],
     "frameworks": ["MessageUI.framework","StoreKit.framework","iAd.framework","CoreData.framework","SystemConfiguration.framework","Social.framework:","Security.framework:","Accounts.framework:","AdSupport.framework:"],
     "headerpaths": [],                    
-    "files": ["/Users/beannt/Documents/FacebookSDK/FacebookSDK.framework", "/Users/beannt/Documents/FacebookSDK/FacebookSDK.framework/Versions/A/Resources/FacebookSDKResources.bundle"],
-    "folders": ["iOS/Store/","iOS/GoogleAnalytics/"],
+    "files": ["ObjC/NativeCode/Appirater.m", "ObjC/NativeCode/Appirater.h"],
+    "folders": ["ObjC/Chartboost/"],
     "excludes": ["^.*.DS_Store$","^.*.meta$", "^.*.mdown^", "^.*.pdf$", "^.*.svn$"],
     "buildSettings": { 
     	"GCC_ENABLE_CPP_EXCEPTIONS": "YES",
